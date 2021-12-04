@@ -135,9 +135,11 @@ while raw_idx < raw_data.count do
 	  new_matrix = board_matrix.map { |x| x == drawing ? "X" : x }
 	  if has_winner(new_matrix) then
 	    found_winner=true
+	    board_score = tally_board(new_matrix)
 	    if draws_to_win <  min_win_steps then
 	      min_win_steps = draws_to_win
-	      min_board_score = tally_board(new_matrix)
+        min_board_score = board_score.clone
+        last_drawn = drawing.clone
 	    end
 	    break
 	  end
@@ -152,4 +154,10 @@ while raw_idx < raw_data.count do
 	end
 	
 end
+
+final_board_score = min_board_score.to_i * last_drawn.to_i
+
+puts ">> Min Draw#[#{min_win_steps}] :: Last Drawn [ #{last_drawn} ] :: Board Score [ #{min_board_score} ] :: Final Board Score [ #{final_board_score} ] "
+
+
 
