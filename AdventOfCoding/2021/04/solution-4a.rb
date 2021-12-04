@@ -100,8 +100,9 @@ def tally_board ( board )
   return tally
 end
 
+min_board_score=0
 while raw_idx < raw_data.count do
-
+	board_score=0
 	pre_board=[]
 	# Read until index points to start of board record
 	while ( raw_data[raw_idx] != nil) do
@@ -126,7 +127,6 @@ while raw_idx < raw_data.count do
 	# Convert board to a matrix, clean up white space
 	board=pre_board.map { |rr| rr.lstrip.rstrip.gsub("  "," ").split(/ /) }
 	board_matrix=mat = Matrix[ *board ]
-	board_score=0
 	# Determine how many steps to get bingo... and resulting score
 	draws_to_win=0
 	found_winner=false
@@ -137,7 +137,7 @@ while raw_idx < raw_data.count do
 	    found_winner=true
 	    if draws_to_win <  min_win_steps then
 	      min_win_steps = draws_to_win
-	      board_score = tally_board(new_matrix)
+	      min_board_score = tally_board(new_matrix)
 	    end
 	    break
 	  end
