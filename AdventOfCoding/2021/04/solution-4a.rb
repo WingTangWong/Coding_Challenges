@@ -60,12 +60,37 @@ min_win_steps=drawn_numbers.count + 1
 # first, let's read in the matrix...
 raw_idx = 1
 
+def display_matrix( board )
+  padding = 5
+  pad_char = " "
+  for y in 0..4 do
+    print ">> [ "
+    for x in 0..4 do
+      if board[x,y] == "X" then
+        print ">X<".rjust(padding+1,pad_char)
+        if x != 4 then
+          print " "
+        end
+      else
+        print board[x,y].to_s.rjust(padding,pad_char)
+        print " "
+        if x != 4 then
+          print " "
+        end
+      end
+    end
+    puts " ]"
+  end
+end
+
+
+
 def has_winner( board )
   # Accepts a Matrix
   board_win=false
   d = board.column_count
-  diag_r=[]
-  diag_l=[]
+  #diag_r=[]
+  #diag_l=[]
   for p in 0..(d-1) do
     # Test column
     if board.column(p).to_a.join == "XXXXX" then
@@ -76,17 +101,17 @@ def has_winner( board )
       board_win=true
     end
     # Test diagonals
-    diag_r.append(board[p,p])
-    diag_l.append(board[(d-1)-p,p])
+  #  diag_r.append(board[p,p])
+  #  diag_l.append(board[(d-1)-p,p])
   end
 
-  if diag_r.join == "XXXXX" then
-    board_win=true
-  end
+  #if diag_r.join == "XXXXX" then
+  #  board_win=true
+  #end
 
-  if diag_l.join == "XXXXX" then
-    board_win=true
-  end
+  #if diag_l.join == "XXXXX" then
+  #  board_win=true
+  #end
 
   return board_win
 end
@@ -127,6 +152,7 @@ while raw_idx < raw_data.count do
 	# Convert board to a matrix, clean up white space
 	board=pre_board.map { |rr| rr.lstrip.rstrip.gsub("  "," ").split(/ /) }
 	board_matrix=mat = Matrix[ *board ]
+  display_matrix(board_matrix)
 	# Determine how many steps to get bingo... and resulting score
 	draws_to_win=0
 	found_winner=false
@@ -135,18 +161,24 @@ while raw_idx < raw_data.count do
 	  new_matrix = board_matrix.map { |x| x == drawing ? "X" : x }
 	  if has_winner(new_matrix) then
 	    found_winner=true
+      if DEBUG then
+        puts " "
+        display_matrix(new_matrix)
+        puts " "
+      end
 	    board_score = tally_board(new_matrix)
 	    if draws_to_win <  min_win_steps then
 	      min_win_steps = draws_to_win
         min_board_score = board_score.clone
-        last_drawn = drawing.clone
+        last_drawn = drawing.to_i * 1
 	    end
+	    puts ">> Draw#[#{draws_to_win}] :: Drew [ #{drawing} ] ::  Winner [ #{found_winner} ] :: Board Score [ #{board_score} ]"
 	    break
 	  end
 	  board_matrix=new_matrix.clone
-	  if DEBUG then
-	    puts ">> Draw#[#{draws_to_win}] :: Drew [ #{drawing} ] ::  Winner [ #{found_winner} ] :: Board Score [ #{board_score} ]"
-	  end
+	  #if DEBUG then
+	  #  puts ">> Draw#[#{draws_to_win}] :: Drew [ #{drawing} ] ::  Winner [ #{found_winner} ] :: Board Score [ #{board_score} ]"
+	  #end
 	end
 	
 	if DEBUG then
