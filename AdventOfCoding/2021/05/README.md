@@ -11,3 +11,8 @@ Various hydrothermal vents are emitting long opaque clouds.
 Map out the horizontal and vertical thermal vent emissions and count out
 how many points of intersection there are.
 
+## 2nd half
+
+Add in diagonal lines.
+
+
