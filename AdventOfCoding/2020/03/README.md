@@ -1,19 +1,22 @@
-# FUN NAME FOR THE CODE CHALLENGE
+# Sliding Through Snow Covered Forest
 
-[AOC 2020](https://adventofcode.com/2020/day/DAY)
+[AOC 2020](https://adventofcode.com/2020/day/3)
 
-SUMMARY
+## SUMMARY
+
+So, we get the tobagon and being the slide down. 
+
+
+
 
 ## 1st half
 
-PROBLEMDESC1
+The first part has us checking to see how many trees we would hit going down at one angle.
 
 ## 2nd half
 
-PROBLEMDESC2
+The second one wants us to try various angles and provide a product of the different tallies.
 
 ## Notes
 
-* ISSUES
-* ISSUES
-* ISSUES
+* Note, the angle/route will extend beyond the width of the provided data... but the question notes that the forest repeats towards the right. nice.
