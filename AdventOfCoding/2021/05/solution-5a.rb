@@ -18,7 +18,6 @@ raw_data = file.readlines.map(&:chomp)
 cooked_data = []
 max_dimension = 0
 
-collision_points=[]
 
 class SparseMatrix
   def initialize
@@ -37,15 +36,18 @@ class SparseMatrix
     @hash[[row, col]] = val
   end
 
+  def show
+    tally=0
+    for key,visits in @hash do
+      if visits >= 2 then
+        tally += 1
+      end
+    end
+    return tally
+  end
 end
 
 vent_map = SparseMatrix.new
-$collision_map = []
-
-def collision( coord )
-  $collision_map.append( coord)
-end
-
 
 def is_horizontal?( src, dst )
   valid = true
@@ -101,9 +103,6 @@ def plot_line( map, src, dst )
         if DEBUG then
           puts ">> H : ( #{x} , #{y} )"
         end
-        if map[x,y] > 0 then
-          collision([x,y])
-        end
         map[x,y] = map[x,y] + 1
       end
     end
@@ -122,9 +121,6 @@ def plot_line( map, src, dst )
       for y in a..b do
         if DEBUG then
           puts ">> V : ( #{x} , #{y} )"
-        end
-        if map[x,y] > 0 then
-          collision([x,y])
         end
         map[x,y] = map[x,y] + 1
       end
@@ -173,4 +169,4 @@ if DEBUG then
   end
 end
 
-puts ">> Collisions [ #{$collision_map.count}]"
+puts ">> Class Tally [ #{vent_map.show} ]"
