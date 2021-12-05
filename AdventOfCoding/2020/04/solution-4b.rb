@@ -2,7 +2,7 @@
 #
 #
 # Validate number of fields
-#
+# * changed working records into array of hashes.
 DEBUG   = false
 SRC     = ARGV[0]
 fh      = File.open(SRC)
@@ -29,7 +29,12 @@ end
 
 new_records = []
 for rec in records do
-  new_records.append( rec.split(/ /) )
+  new_entry = {}
+  for r in rec.split(/ /) do
+    key,value = r.split(/:/)
+    new_entry[key] = value
+  end
+  new_records.append( new_entry )
 end
 
 if DEBUG then
@@ -53,6 +58,30 @@ records = new_records.clone
 
 ALL_FIELDS      = [ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid" ]
 REQUIRED_FIELDS = [ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid" ]
+
+#  byr (Birth Year) - four digits; at least 1920 and at most 2002.
+#  iyr (Issue Year) - four digits; at least 2010 and at most 2020.
+#  eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
+#  hgt (Height) - a number followed by either cm or in:
+#  If cm, the number must be at least 150 and at most 193.
+#  If in, the number must be at least 59 and at most 76.
+#  hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+#  ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+#  pid (Passport ID) - a nine-digit number, including leading zeroes.
+#  cid (Country ID) - ignored, missing or not.
+
+
+def valid_pid( record )
+  valid = true
+  if record.length == 9 then
+  end
+  return valid
+end
+
+def valid_cid( record )
+  return true
+end
+
 
 
 def are_all_fields_present( record, fields )
@@ -85,6 +114,7 @@ for record in records do
   if is_record_valid( record ) then
     valid_records += 1
   end
+  puts valid_pid(record)
 end
 
 puts "Total records: #{total_records} , Valid records: #{valid_records}"
