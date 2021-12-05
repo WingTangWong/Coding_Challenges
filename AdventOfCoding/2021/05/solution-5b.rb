@@ -3,7 +3,7 @@
 # Hydrothermal vents..
 # Add diagonals...
 #
-DEBUG=true
+DEBUG=false
 require 'matrix'
 
 params=ARGV
