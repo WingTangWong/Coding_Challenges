@@ -52,6 +52,9 @@ records = new_records.clone
 ALL_FIELDS      = [ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid", "cid" ]
 REQUIRED_FIELDS = [ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid" ]
 
+VALID_EYE_COLORS = [ "amb","blu","brn","gry","grn","hzl","oth" ]
+
+
 #  byr (Birth Year) - four digits; at least 1920 and at most 2002.
 #  iyr (Issue Year) - four digits; at least 2010 and at most 2020.
 #  eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
@@ -64,37 +67,105 @@ REQUIRED_FIELDS = [ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid" ]
 #  cid (Country ID) - ignored, missing or not.
 def is_byr_valid?( record )
   valid = true
+  if ( /^\d\d\d\d$/ =~ record["byr"]) == nil then
+    valid = false
+  end
+  if ( record["byr"].to_i <1920 ) || ( record["byr"].to_i > 2002 ) then
+    valid = false
+  end
+  if DEBUG then
+    puts "[BYR]>> #{valid} ( #{record["byr"]} )"
+  end
   return valid
 end
 
 def is_iyr_valid?( record )
   valid = true
+  if ( /^\d\d\d\d$/ =~ record["iyr"]) == nil then
+    valid = false
+  end
+  if ( record["iyr"].to_i < 2010) || ( record["iyr"].to_i > 2020 ) then
+    valid = false
+  end
+  if DEBUG then
+    puts "[IYR]>> #{valid} ( #{record["iyr"]} )"
+  end
   return valid
 end
 
 def is_eyr_valid?( record )
   valid = true
+  if ( /^\d\d\d\d$/ =~ record["eyr"]) == nil then
+    valid = false
+  end
+  if ( record["eyr"].to_i < 2020 ) || ( record["eyr"].to_i > 2030 ) then
+    valid = false
+  end
+  if DEBUG then
+    puts "[EYR]>> #{valid} ( #{record["eyr"]} )"
+  end
   return valid
 end
 
 def is_hgt_valid?( record )
   valid = true
+
+#  If cm, the number must be at least 150 and at most 193.
+#  If in, the number must be at least 59 and at most 76.
+  hmin=0
+  hmax=0
+  hnum=-1
+  hval=record["hgt"].to_s
+
+  if hval.end_with?("cm") then
+    hmin=150
+    hmax=193
+    hnum=/^[\d][\d]*/.match(hval).to_s.to_i
+  end
+
+  if hval.end_with?("in") then
+    hmin=59
+    hmax=76
+    hnum=/^[\d][\d]*/.match(hval).to_s.to_i
+  end
+
+  if ( ( hnum < hmin ) || ( hnum > hmax ) ) then
+    valid = false
+  end
+
+  if DEBUG then
+    puts "[HGT]>> #{valid} ( #{hval} , #{hnum}, #{hmin}, #{hmax} )"
+  end
   return valid
 end
 
 def is_hcl_valid?( record )
   valid = true
+  #  hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+  if ( /^#[a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]$/ =~ record["hcl"] ) == nil then
+    valid = false
+  end
+  if DEBUG then
+    puts "[HCL]>> #{valid} ( #{record["hcl"]} )"
+  end
   return valid
 end
 
 def is_ecl_valid?( record )
   valid = true
+  if !VALID_EYE_COLORS.include?(record["ecl"]) then
+    valid = false
+  end
+  if DEBUG then
+    puts "[ECL]>> #{valid}"
+  end
   return valid
 end
 
 def is_pid_valid?( record )
   valid = true
-  if record["pid"].length != 9 then
+  # 9 digit number
+  if (/^\d\d\d\d\d\d\d\d\d$/ =~ record["pid"]) == nil then
     valid = false
   end
   if DEBUG then
@@ -173,6 +244,14 @@ def is_record_valid?( record )
   if !is_hgt_valid?(record) then
     valid = false
   end
+  # validate ecl
+  if !is_ecl_valid?(record) then
+    valid = false
+  end
+  # validate hcl
+  if !is_hcl_valid?(record) then
+    valid = false
+  end
   return valid
 end
 
@@ -182,13 +261,14 @@ valid_records = 0
 
 for record in records do
   if DEBUG then
-    puts ">> Record ##{valid_records}"
+    puts ">> Record ##{total_records}"
   end
   if is_record_valid?( record ) then
     valid_records += 1
   end
   if DEBUG then
     puts ">> Valid Records: #{valid_records}"
+    puts " "
   end
   total_records += 1
 end
