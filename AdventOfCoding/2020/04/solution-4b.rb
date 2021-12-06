@@ -3,7 +3,7 @@
 #
 # Validate number of fields
 # * changed working records into array of hashes.
-DEBUG   = false
+DEBUG   = true
 SRC     = ARGV[0]
 fh      = File.open(SRC)
 raw_data = fh.readlines.map { | datum | datum.chomp }
@@ -37,13 +37,6 @@ for rec in records do
   new_records.append( new_entry )
 end
 
-if DEBUG then
-  puts records.length
-  puts records
-  puts new_records.length
-  puts new_records
-end
-
 records = new_records.clone
 
 # Fields
@@ -71,37 +64,72 @@ REQUIRED_FIELDS = [ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid" ]
 #  cid (Country ID) - ignored, missing or not.
 
 
-def valid_pid( record )
+def is_pid_valid?( record )
   valid = true
-  if record.length == 9 then
+  if record["pid"].length != 9 then
+    valid = false
+  end
+  if DEBUG then
+    puts "[PID]>> #{valid}"
   end
   return valid
 end
 
-def valid_cid( record )
+def is_cid_valid?( record )
+  if DEBUG then
+    puts "[CID]>> always true"
+  end
   return true
 end
 
 
 
-def are_all_fields_present( record, fields )
+def is_field_count_valid?( record, fields )
   valid = true
+  if DEBUG then
+    puts "[field count]>> field count : required : ##{fields.count}"
+  end
+  
+  found_fields = record.keys.map { | ff | ff.to_s }
+  
+  if DEBUG then
+    puts "[field count]>> found fields: : ##{found_fields}"
+  end
+
   for f in fields do
-    r_check=0
-    for r in record do
-      if r.start_with?(f) then
-        r_check += 1
+    if !found_fields.member?(f) then
+      valid = false
+      if DEBUG then
+        puts "[field count]>> did not find field : #{f}"
       end
     end
-    valid = valid && ( r_check == 1 )
+  end
+
+  if DEBUG then
+    puts "[field count]>> field_count valid : #{valid}"
   end
   return valid
 end
 
 
-def is_record_valid( record )
+def is_record_valid?( record )
   valid = true
-  valid = valid && are_all_fields_present( record, REQUIRED_FIELDS )
+  if DEBUG then
+    puts ">> is_record_valid : start : ##{valid}"
+  end
+    # check for field count
+    if !is_field_count_valid?( record, REQUIRED_FIELDS ) then
+      valid = false
+    else
+    # validate pid
+    if !is_pid_valid?(record) then
+      valid = false
+    end
+    # validate cid
+    if !is_cid_valid?(record) then
+      valid = false
+    end
+  end
   return valid
 end
 
@@ -110,22 +138,16 @@ total_records = 0
 valid_records = 0
 
 for record in records do
-  total_records += 1
-  if is_record_valid( record ) then
+  if DEBUG then
+    puts ">> Record ##{valid_records}"
+  end
+  if is_record_valid?( record ) then
     valid_records += 1
   end
-  puts valid_pid(record)
+  if DEBUG then
+    puts ">> Valid Records: #{valid_records}"
+  end
+  total_records += 1
 end
 
 puts "Total records: #{total_records} , Valid records: #{valid_records}"
-
-
-
-
-
-
-
-
-
-
-
