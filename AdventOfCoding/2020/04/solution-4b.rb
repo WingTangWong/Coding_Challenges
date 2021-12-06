@@ -62,7 +62,35 @@ REQUIRED_FIELDS = [ "byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid" ]
 #  ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
 #  pid (Passport ID) - a nine-digit number, including leading zeroes.
 #  cid (Country ID) - ignored, missing or not.
+def is_byr_valid?( record )
+  valid = true
+  return valid
+end
 
+def is_iyr_valid?( record )
+  valid = true
+  return valid
+end
+
+def is_eyr_valid?( record )
+  valid = true
+  return valid
+end
+
+def is_hgt_valid?( record )
+  valid = true
+  return valid
+end
+
+def is_hcl_valid?( record )
+  valid = true
+  return valid
+end
+
+def is_ecl_valid?( record )
+  valid = true
+  return valid
+end
 
 def is_pid_valid?( record )
   valid = true
@@ -117,18 +145,33 @@ def is_record_valid?( record )
   if DEBUG then
     puts ">> is_record_valid : start : ##{valid}"
   end
-    # check for field count
-    if !is_field_count_valid?( record, REQUIRED_FIELDS ) then
-      valid = false
-    else
-    # validate pid
-    if !is_pid_valid?(record) then
-      valid = false
-    end
-    # validate cid
-    if !is_cid_valid?(record) then
-      valid = false
-    end
+  # check for field count
+  if !is_field_count_valid?( record, REQUIRED_FIELDS ) then
+    valid = false
+  end
+  # validate pid
+  if !is_pid_valid?(record) then
+    valid = false
+  end
+  # validate cid
+  if !is_cid_valid?(record) then
+    valid = false
+  end
+  # validate byr
+  if !is_byr_valid?(record) then
+    valid = false
+  end
+  # validate iyr
+  if !is_iyr_valid?(record) then
+    valid = false
+  end
+  # validate eyr
+  if !is_eyr_valid?(record) then
+    valid = false
+  end
+  # validate hgt
+  if !is_hgt_valid?(record) then
+    valid = false
   end
   return valid
 end
