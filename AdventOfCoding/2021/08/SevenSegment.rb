@@ -92,6 +92,40 @@ class SevenSegment
     @@default_segments_to_digits["acf"]     = "7"
     @@default_segments_to_digits["abcdefg"] = "8"
     @@default_segments_to_digits["abcdfg"]  = "9"
+
+    @@default_segments_to_digits = {}
+    @@default_digits_to_segments = {}
+    @@segments_to_digits = {}
+    @@digits_to_segments = {}
+    @@permutations = {}
+    @@permutations[0] = []
+    @@permutations[1] = []
+    @@permutations[2] = []
+    @@permutations[3] = []
+    @@permutations[4] = []
+    @@permutations[5] = []
+    @@permutations[6] = []
+    @@permutations[7] = []
+    @@permutations[8] = []
+    @@permutations[9] = []
+
+    @@bylength={} 
+    @@bylength[7]=[]
+    @@bylength[6]=[]
+    @@bylength[5]=[]
+    @@bylength[4]=[]
+    @@bylength[3]=[]
+    @@bylength[2]=[]
+
+    @@translation={}
+    @@translation["a"]="x"
+    @@translation["b"]="x"
+    @@translation["c"]="x"
+    @@translation["d"]="x"
+    @@translation["e"]="x"
+    @@translation["f"]="x"
+    @@translation["g"]="x"
+
   end
 
   def ingest( cipher )
