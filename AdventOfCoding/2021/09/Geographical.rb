@@ -7,12 +7,23 @@ class Geographical
   @@max_row=0
   @@min_col=0
   @@max_col=0
+  @@minimas=[]
+  @@current_basin=1000
 
   def initialize
     @@geographical_data[:row_width]=0
     @@geographical_data[:raw_data]=[]
     @@geographical_data[:local_minima]={}
     @@geographical_data[:map]={}
+    @@current_basin=1000
+  end
+
+  def max_row
+    return @@max_row.to_i
+  end
+
+  def max_col
+    return @@max_col.to_i
   end
 
   def ingest( lines )
@@ -40,11 +51,16 @@ class Geographical
     end
   end 
 
-  def display
+  def display ( field_size = 1 )
+    ff="%#{field_size}s" 
     for row in 0.upto(@@geographical_data[:map].length) do
       if @@geographical_data[:map][row] != nil then
         for col in 0.upto(@@geographical_data[:map][row].length-1) do
-          print " %3d " % [ @@geographical_data[:map][row][col] ]
+          if @@geographical_data[:map][row][col] != nil then
+            print ff % [ @@geographical_data[:map][row][col] ]
+          else
+            print ff % [" "]
+          end
         end
         puts ""
       end
@@ -58,7 +74,7 @@ class Geographical
       if @@geographical_data[:map][row] != nil then
         for col in 0.upto(@@geographical_data[:map][row].length-1) do
           if is_local_minima?( row,col) then
-            print " >%1d< " % [ @@geographical_data[:map][row][col] ]
+            print " >%1d< " % [ @@geographical_data[:map][row][col].to_i ]
             tally += @@geographical_data[:map][row][col].to_i + 1
           else
             print "  %1d  " % [ @@geographical_data[:map][row][col] ]
@@ -70,9 +86,6 @@ class Geographical
     puts "Tally: %d" % [ tally ]
     #puts "#{@@geographical_data[:map]}"
   end
-
-
-
 
 
   def is_local_minima?( target_y,target_x)
@@ -92,23 +105,139 @@ class Geographical
             if DEBUG then
             puts "(#{x},#{y}) => #{@@geographical_data[:map][y][x]}"
             end
-            side=@@geographical_data[:map][y][x]
+            side=@@geographical_data[:map][y][x].to_i
             # Yep. Anything smaller than or equal to the target point is invalid
-            if side <= middle then
+            if side <= middle.to_i then
               valid=false
             end
           end
         end
       end
     end
+    if valid then
+      @@minimas.append([target_y,target_x])
+    end
     return valid
   end
 
-
-
-  def find_basins
-    # 
+  # Hmm... this removes all of the nines and displays in a way that 
+  # is easy to see the basins
+  #
+  #  ###############################
+  #  # 2  1 ######### 4  3  2  1  0#
+  #  # 3 ### 8  7  8 ### 4 ### 2  1#
+  #  #### 8  5  6  7  8 ### 8 ### 2#
+  #  # 8  7  6  7  8 ### 6  7  8 ###
+  #  #### 8 ######### 6  5  6  7  8#
+  #  ###############################
+  #
+  #  Looks like we now need to find a way of
+  #  grouping the basin points together.
+  #
+  def remove_nines
+    for row in 0.upto(@@geographical_data[:map].length) do
+      if @@geographical_data[:map][row] != nil then
+        for col in 0.upto(@@geographical_data[:map][row].length-1) do
+          if @@geographical_data[:map][row][col].to_i < 9 then
+            if DEBUG then
+              print " %1d " % [ @@geographical_data[:map][row][col] ]
+            end
+          else
+            # Remove 9's.
+            @@geographical_data[:map][row][col]=nil
+            if DEBUG then
+              print "#%1s#" % [ "#" ]
+            end
+          end
+        end
+        if DEBUG then
+          puts ""
+        end
+      end
+    end
   end
 
+  def get_minimas
+    return @@minimas.to_a
+  end
 
+  def fill_touching( row, col )
+    # Given a starting location... continue to explore until all unflagged spaces are flagged.
+    todo=[]
+    todo.append([row,col])
+    visited=[]
+    not_wall=[]
+
+    while (todo.length > 0) do
+      (r,c) = todo.shift
+      todo = todo.sort.uniq
+      visited = visited.sort.uniq
+      r = r.to_i
+      c = c.to_i
+      visited.append([r,c])
+      
+      # up
+      if ( r-1 ) >= 0 then
+        if !visited.include?([r-1,c]) then
+          if ( @@geographical_data[:map][r-1][c] == nil  ) | ( @@geographical_data[:map][r-1][c].to_i == 9) then
+            visited.append([r-1,c])
+          else
+            todo.append([r-1,c])  
+          end
+        end
+      end
+
+        # down
+      if ( r+1 ) <= @@max_row then
+        if !visited.include?([r+1,c]) then
+          if ( @@geographical_data[:map][r+1][c] == nil  ) | ( @@geographical_data[:map][r+1][c].to_i == 9) then
+            visited.append([r+1,c])
+          else
+            todo.append([r+1,c])  
+          end
+        end
+      end
+
+        # left
+      if ( c-1 ) >= 0 then
+        if !visited.include?([r,c-1]) then
+          if ( @@geographical_data[:map][r][c-1] == nil  ) | ( @@geographical_data[:map][r][c-1].to_i == 9) then
+            visited.append([r,c-1])
+          else
+            todo.append([r,c-1])  
+          end
+        end
+      end
+
+        # right
+      if ( c+1 ) <= @@max_col  then
+        if !visited.include?([r,c+1]) then
+          if ( @@geographical_data[:map][r][c+1] == nil  ) | ( @@geographical_data[:map][r][c+1].to_i == 9) then
+            visited.append([r,c+1])
+          else
+            todo.append([r,c+1])  
+          end
+        end
+      end
+
+      # Okay, what are WE?
+      if !( @@geographical_data[:map][r] == nil ) && !( @@geographical_data[:map][r][c] == nil ) then
+        if (( @@geographical_data[:map][r][c].to_i >= 0 ) & ( @@geographical_data[:map][r][c].to_i <= 8 )) then
+          not_wall.append([r.to_i,c.to_i])
+        end
+      end
+      #puts ">> Todo    = #{todo.length} :: #{todo}"
+      #puts ">> Visited = #{visited.length} :: #{visited}"
+      #puts ">> Not Wall= #{not_wall.length}"
+
+      if visited.length > ( @@max_row * @@max_col ) then
+        puts "Visisted is too high! Something broke!"
+        exit
+      end
+    end
+    visited=visited.sort.uniq
+    not_wall=not_wall.sort.uniq
+    puts ">> Visited [ #{visited.length} ] / Not Wall [ #{not_wall.length} ]"
+    return not_wall.length
+  end
 end
