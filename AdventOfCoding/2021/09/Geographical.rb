@@ -76,33 +76,39 @@ class Geographical
 
 
   def is_local_minima?( target_y,target_x)
-    # presume grid is a 3x3 matrix
-    # Target spot is in the middle
+    # Given Y,X positions...
+    # Determine which positions around it we need to get readings of.
+    # If any of the positions are <= to the target position, then this isn't a lowest point.
+    #
     valid = true
     neighbors = [ [target_x,target_y-1] , [target_x,target_y+1] , [target_x-1,target_y] , [target_x+1,target_y] ]
-    #puts "#{neighbors}"
-    #puts @@max_col
-    #puts @@max_row
     middle = @@geographical_data[:map][target_y][target_x]
     for (x,y) in neighbors do
       if ( x>=0 ) & ( x<=@@max_col ) then
         if ( y>=0 ) & ( y<=@@max_row ) then
+          # Test to see if the neighbor position is outside of the map. No fault
+          # but also nothing to act on.
           if @@geographical_data[:map][y][x] != nil then
             if DEBUG then
             puts "(#{x},#{y}) => #{@@geographical_data[:map][y][x]}"
             end
             side=@@geographical_data[:map][y][x]
+            # Yep. Anything smaller than or equal to the target point is invalid
             if side <= middle then
               valid=false
             end
           end
-          #if @@geographical_data[:map][target_y][target_x] >= @@geographical_data[:map][y][x] then
-          #  valid = false
-          #end
         end
       end
     end
     return valid
   end
+
+
+
+  def find_basins
+    # 
+  end
+
 
 end
