@@ -53,11 +53,13 @@ class Geographical
   end
 
   def display_with_minima
+    tally=0
     for row in 0.upto(@@geographical_data[:map].length) do
       if @@geographical_data[:map][row] != nil then
         for col in 0.upto(@@geographical_data[:map][row].length-1) do
           if is_local_minima?( row,col) then
             print " >%1d< " % [ @@geographical_data[:map][row][col] ]
+            tally += @@geographical_data[:map][row][col].to_i + 1
           else
             print "  %1d  " % [ @@geographical_data[:map][row][col] ]
           end
@@ -65,6 +67,7 @@ class Geographical
         puts ""
       end
     end
+    puts "Tally: %d" % [ tally ]
     #puts "#{@@geographical_data[:map]}"
   end
 
