@@ -1,60 +1,65 @@
 #!/usr/bin/env ruby
 
+require 'pp'
 SRC     = ARGV[0]
 fh      = File.open(SRC)
 
-rawdata = fh.readlines.map(&:chomp)
+# Second half.. need to get where everyone voted the same.
+#
+#   abc
+# 
+#   a
+#   b
+#   c
+# 
+#   ab
+#   ac
+# 
+#   a
+#   a
+#   a
+#   a
+# 
+#   b
+#
+#
+rawdata = fh.readlines.map(&:chomp).map { |x| x==""  ? "#" : x }.join(':').split("#")
+# ["abc:", ":a:b:c:", ":ab:ac:", ":a:a:a:a:", ":b"]
 
-didx=0
-gidx=0
+groups={}
 
-
-datum=""
-while didx <= rawdata.length do
-  datum += rawdata[didx] + ":" 
-
-end
-
-
-
-
-groups=rawdata.to_a.map { |x| }
-
-
-gidx=0
-
-puts "#{groups}"
-
-exit 
-
-# Prep the hash
-for i in 0.upto(rawdata.length+1) do
-  groups[i]=[]
-end
-
-
-def group_vote_count(group)
-  tally=0
-  voters=group.length
-  votes=group.map { |v| v.split(//) }
-
-  common_votes=votes[0]
-
-  votes.map { |v| common_votes &= v }
-
-  puts "#{group.length} #{common_votes}"
-  puts ""
-end
-
-for dline in rawdata do
-  if dline != "" then
-    groups[gidx].append(dline)
-  else
-    group_vote_count(groups[gidx])
-    gidx += 1 
+def alpha_to_bit( start_state=[0]*26, c )
+  result = start_state
+  for symbol in 'a'.upto('z') do
+    if c.include?(symbol) then
+      result[(symbol.ord - 'a'.ord).to_i] += 1
+    end
   end
+  return result
 end
 
-gidx += 1 
-groups[gidx].append(dline)
+for g in rawdata do
+  group = []
+  if g[-1] == ":" then
+    g=g.delete_suffix(":")
+  end
+  if g[0] == ":" then
+    g=g.split(//).drop(1).join
+  end
+  gstate=[0]*26
+  gall=0 
+  for i in g.split(/:/).to_a do
+    gall += 1
+    gstate=alpha_to_bit( gstate, i )
+  end
+  gcount=0
+  gstate.map { |x| x==gall ? gcount += 1 : true }
+  groups[g]=gcount
+end
 
+scores=0
+
+print "Scores: "
+groups.map { |k,v| print "#{v}, "; scores += v }
+puts " "
+puts "Group Tally: #{scores}"
