@@ -143,15 +143,20 @@ def stepMatrix( m )
 
 
 step = 0
-STEP_END=100
-DEBUG=true
+STEP_END=100000
+DEBUG=false
 while step < STEP_END do
   if DEBUG then
     puts("[Step %d] Matrix State" % step)
-    puts(dataMatrix.variance)
-    puts("")
   end
-  dataMatrix=stepMatrix( dataMatrix )
+  if dataMatrix.variance.to_a.sum == 0.0 then
+    puts("[Step %d] Matrix State" % step)
+    dataMatrix=stepMatrix( dataMatrix )
+  end
+  if step % 50 == 0 then
+    puts("[Step %d] Matrix State" % step)
+    dataMatrix=stepMatrix( dataMatrix )
+  end
   if DEBUG then
     displayMatrix(dataMatrix)
   end
@@ -159,6 +164,3 @@ while step < STEP_END do
 end
 
 puts("Total flashes: %s" % $total_flashes)
-
-
-

@@ -144,13 +144,14 @@ def stepMatrix( m )
 
 step = 0
 STEP_END=10
-DEBUG=true
+DEBUG=false
 while step < STEP_END do
   if DEBUG then
     puts("[Step %d] Matrix State" % step)
   end
   dataMatrix=stepMatrix( dataMatrix )
-  if DEBUG then
+  if dataMatrix.variance.to_a.sum == 0 then
+    puts("[Step %d] Matrix State" % step)
     displayMatrix(dataMatrix)
   end
   step += 1
