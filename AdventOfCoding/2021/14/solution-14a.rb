@@ -5,8 +5,8 @@ DEBUG=false
 PRACTICE1="data/sample.txt"
 REAL_DATA="data/prod.txt"
 
-#DATUM=open(REAL_DATA,"r").readlines.map(&:chomp)
-DATUM=open(PRACTICE1,"r").readlines.map(&:chomp)
+DATUM=open(REAL_DATA,"r").readlines.map(&:chomp)
+#DATUM=open(PRACTICE1,"r").readlines.map(&:chomp)
 
 require 'pp'
 require 'nmatrix'
@@ -55,7 +55,7 @@ while true do
     end
     reaction["results"].append(new_polymer.dup)
     reaction["state"]=new_polymer.dup
-    puts("Step #{step} : Length #{new_polymer.length} : #{new_polymer}")
+    puts("Step #{step} : Length #{new_polymer.length}")
   end
   if step == 10 then
     break
