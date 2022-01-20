@@ -5,7 +5,7 @@ DEBUG=false
 PRACTICE1="data/sample.txt"
 REAL_DATA="data/prod.txt"
 
-DATUM=open(REAL_DATA,"r").readlines.map(&:chomp)
+DATUM=open(PRACTICE1,"r").readlines.map(&:chomp)
 #DATUM=open(PRACTICE1,"r").readlines.map(&:chomp)
 
 require 'pp'
@@ -28,51 +28,34 @@ for new_rule in DATUM do
     end
 end
 
-# pp(polymerization_result)
 
+def polymerize
+  # This definitely points past end of string, 
+  polymerHead=$polymer.length
+  polymerTail=$polymer.length+1
+  chemH=$polymer[polymerHead]
+  chemT=$polymer[polymerTail]
+  # Seek backwards through string and perform insertions
+  while chemT == nil do
+    polymerHead -= 1
+    polymerTail -= 1
+    chemH=$polymer[polymerHead]
+    chemT=$polymer[polymerTail]
+  end
+  while polymerTail > 0 do
+    chemH=$polymer[polymerHead]
+    chemT=$polymer[polymerTail]
+    chemC=$REACTION[chemH + chemT]
+    $polymer.insert(polymerTail,chemC)
+    polymerHead -= 1
+    polymerTail -= 1
+  end
+end
 step=0
-
-reaction={}
-
-while true do
-  if step == 0 then
-    reaction["state"]=sequence_start.dup
-    reaction["results"]=[]
-    reaction["results"].append(reaction["state"])
-    reaction["rules"]=polymerization_rules
-    reaction["conversion"]=polymerization_result
-  else
-    polymer=reaction["state"].split(//)
-    new_polymer=""
-    for chain_pos in 0..polymer.length do
-      if ( chain_pos + 1 ) == polymer.length then
-        new_polymer += polymer[chain_pos]
-        break
-      end
-      isomer="#{polymer[chain_pos]}#{polymer[chain_pos+1]}".upcase
-      product=reaction["rules"][isomer]
-      new_polymer += "%s%s" % [ polymer[chain_pos], product]
-    end
-    reaction["state"]=new_polymer.dup
-    puts("Step #{step} : Length #{new_polymer.length}")
-  end
-  if step == 40 then
-    break
-  end
+$REACTION=polymerization_rules.dup
+$polymer=sequence_start.split(//).join
+while step < 41 do
+  puts("%5d : %15d" % [ step , $polymer.length ] )
+  polymerize
   step += 1
 end
-
-tenth=reaction["state"].split(//)
-histogram={}
-for element in reaction["state"].split(//) do
-  if histogram[element] == nil then
-    histogram[element]=1
-  else
-    histogram[element] += 1
-  end
-end
-numbers=histogram.values.sort
-pop_max=numbers[-1]
-pop_min=numbers[0]
-pop_delta=pop_max-pop_min
-puts("Delta: #{pop_delta}")
