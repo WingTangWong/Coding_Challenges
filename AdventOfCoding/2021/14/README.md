@@ -47,3 +47,7 @@ The submarine manual contains instructions for finding the optimal polymer formu
   After step 3: NBBBCNCCNBBNBNBBCHBHHBCHB
   After step 4: NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB
 
+# Getting to the 40th step
+
+Seems using Ruby, string replacement/insertion, at best, I can get to step 18-19 before the amount of time required to complete a sequence takes too long.
+

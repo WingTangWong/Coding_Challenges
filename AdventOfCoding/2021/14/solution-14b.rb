@@ -3,6 +3,7 @@
 DEBUG=false
 
 PRACTICE1="data/sample.txt"
+PRACTICE2="data/small.txt"
 REAL_DATA="data/prod.txt"
 
 DATUM=open(PRACTICE1,"r").readlines.map(&:chomp)
@@ -13,6 +14,7 @@ require 'nmatrix'
 
 # So... a starting state sequence at the top.
 # All following lines create rules for what is to be inserted between the two
+puts("wef")
 
 sequence_start=DATUM[0]
 
@@ -53,9 +55,14 @@ def polymerize
 end
 step=0
 $REACTION=polymerization_rules.dup
-$polymer=sequence_start.split(//).join
+#$polymer=sequence_start.split(//).join
+
+$polymer="NC"
+
 while step < 41 do
-  puts("%5d : %15d" % [ step , $polymer.length ] )
+  #puts("%5d : %15d : #{$polymer}" % [ step , $polymer.length ] )
+  puts("%5d : %15d " % [ step , $polymer.length ] )
+  puts($polymer.chars.sort.tally)
   polymerize
   step += 1
 end
